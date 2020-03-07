@@ -1,0 +1,58 @@
+static_resources:
+  listeners:
+    - name: listener_1
+      address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: 10000
+      filter_chains:
+        - filters:
+            - name: envoy.http_connection_manager
+              config:
+                access_log:
+                  - name: envoy.file_access_log
+                    config:
+                      path: /dev/stdout
+                stat_prefix: ingress_http
+                route_config:
+                  name: ping
+                  virtual_hosts:
+                    - name: ping
+                      domains: ["*"]
+                      routes:
+                        - match:
+                            prefix: "/sp.rpc.PingService/"
+                          route:
+                            host_rewrite: ping
+                            cluster: ping
+                            timeout: 2.00s
+                          per_filter_config:
+                            envoy.filters.http.grpc_http1_reverse_bridge:
+                              disabled: true
+                http_filters:
+                  - name: envoy.filters.http.grpc_http1_reverse_bridge
+                    config:
+                      content_type: application/grpc+proto
+                      withhold_grpc_frames: true
+                  - name: envoy.router
+  clusters:
+    - name: ping
+      connect_timeout: 2.00s
+      type: strict_dns
+      lb_policy: round_robin
+      http2_protocol_options: {}
+      load_assignment:
+        cluster_name: ping
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: ping
+                      port_value: 10005
+admin:
+  access_log_path: /dev/stdout
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 9902
