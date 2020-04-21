@@ -42,6 +42,14 @@ func TestServiceServer_Ping(t *testing.T) {
 			version: "envoy:v1.13.1",
 			addr:    "envoy-v1-13-1:10000",
 		},
+		{
+			version: "envoy:v1.14.1",
+			addr:    "envoy-v1-14-1:10000",
+		},
+		{
+			version: "envoy-dev:latest",
+			addr:    "envoy-dev-latest:10000",
+		},
 	}
 
 	for _, tc := range testCases {

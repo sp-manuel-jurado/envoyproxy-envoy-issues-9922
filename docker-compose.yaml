@@ -64,6 +64,24 @@ services:
     volumes:
       - ./envoy.yaml:/etc/envoy/envoy.yaml
 
+  envoy-v1-14-1:
+    image: envoyproxy/envoy:v1.14.1
+    depends_on:
+      - ping
+    expose:
+      - "10000"
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+
+  envoy-dev-latest:
+    image: envoyproxy/envoy-dev:latest
+    depends_on:
+      - ping
+    expose:
+      - "10000"
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+
   test:
     image: golang:1.13
     depends_on:
@@ -74,6 +92,8 @@ services:
       - envoy-v1-12-3
       - envoy-v1-13-0
       - envoy-v1-13-1
+      - envoy-v1-14-1
+      - envoy-dev-latest
     working_dir: /go/github.com/socialpoint/envoyproxy-envoy-issues-9922/services/ping
     volumes:
       - ./services/ping:/go/github.com/socialpoint/envoyproxy-envoy-issues-9922/services/ping
